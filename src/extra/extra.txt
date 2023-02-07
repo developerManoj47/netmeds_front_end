@@ -1,0 +1,7 @@
+get all list  __------>  http://localhost:8000/api/list
+
+get list according to cate_id  ----->   http://localhost:8000/api/list/:cate_id
+
+get list of random items   ----->   http://localhost:8000/api/list/:cate_id?category=( beauty , or medicine )
+
+get list according to price   ----->  http://localhost:8000/api/list/:cate_id?lcost=200&hcost=1000
