@@ -6,13 +6,14 @@ import { useNavigate } from 'react-router-dom';
 
 const PlaceOrder = () => {
 
-    const [email, setEmail] = useState('');
+    // const [email, setEmail] = useState('');
     const [phone, setPhone] = useState(0);
-    const [fname, setFname] = useState('');
+    // const [fname, setFname] = useState('');
     const [address, setAddress] = useState('');
-    const [orderId, setOrderId] = useState(Math.floor(Math.random() * 10000))
+    // const [orderId, setOrderId] = useState(Math.floor(Math.random() * 10000))
     // setOrderId(Math.floor(Math.random() * 10000))
     const [isPlaced, setIsPlaced] = useState(false)
+    let extra = Math.floor(Math.random() * 90000) + 10000;
 
     const navigate = useNavigate();
 
@@ -21,64 +22,92 @@ const PlaceOrder = () => {
     let orderItems = JSON.parse(localStorage.getItem('orderItems'));
     console.log(` order items object `, orderItems);
 
+    function isDate(val) {
+        // Cross realm comptatible
+        return Object.prototype.toString.call(val) === '[object Date]'
+    }
 
-        // PAYTM 
-    // CREATING SCRIPT FOR PAYTM  
-    const loadCheckoutScript = (mid, config) => {
-        
-        const url = 'https://securegw-stage.paytm.in/merchantpgpui/checkoutjs/merchants/';
-        const scriptElement = document.createElement('script');
-        scriptElement.async = true;
-        scriptElement.src = url.concat(mid);
-        scriptElement.type = 'application/javascript';
-        scriptElement.onload = () => {
-            onScriptLoad(config)
-        };
-        scriptElement.onerror = error => {
-          console.error("USE_EXISTING_CHECKOUT_INSTANCE" + 'script load fail!');
-        }
-        document.body.appendChild(scriptElement);
-      }
+    function isObj(val) {
+        return typeof val === 'object'
+    }
 
-
-    // FUNCTION TO OPEN THE PAYTM WINDOW 
-    function onScriptLoad(config) {
-
-        if (window.Paytm && window.Paytm.CheckoutJS) {
-            window.Paytm.CheckoutJS.onLoad(function excecuteAfterCompleteLoad() {
-                // initialze configuration using init method
-                // window.Paytm.CheckoutJS.init({
-                //     style:{
-                //       "themeColor":"#7400b8"    
-                //     }
-                //   });
-                window.Paytm.CheckoutJS.init(config)
-                    .then(function onSuccess(result) {
-                        // after successfully updating configuration, invoke JS Checkout
-                        window.Paytm.CheckoutJS.invoke();
-                        console.log(`info after payment proceed`,result);
-                    }).catch(function onError(error) {
-                        console.log("error => ", error);
-                    });
-            });
+    function stringifyValue(val) {
+        if (isObj(val) && !isDate(val)) {
+            return JSON.stringify(val)
+        } else {
+            return val
         }
     }
 
+    function buildForm({ action, params }) {
+        const form = document.createElement('form')
+        form.setAttribute('method', 'post')
+        form.setAttribute('action', action)
 
-    // form submit for Place order 
-    const checkOut = async (event) => {
+        Object.keys(params).forEach(key => {
+            const input = document.createElement('input')
+            input.setAttribute('type', 'hidden')
+            input.setAttribute('name', key)
+            input.setAttribute('value', stringifyValue(params[key]))
+            form.appendChild(input)
+        })
 
+        return form
+    }
+
+    function post(details) {
+        const form = buildForm(details)
+        document.body.appendChild(form)
+        form.submit()
+        form.remove()
+    }
+
+    const getData = async () => {
+
+        
+        const data = {
+            amount: orderItems.totalAmmount,
+            name: user.username,
+            email: user.email,
+            phone_number: phone,
+            order_id: "order_" + extra,
+            number: extra
+        }
+
+        // const checksum = await axios.post()
+        return axios(`http://localhost:8000/api/payment/paytm`, {
+            method: "POST",
+            headers: {
+                Accept: "application/json",
+                "Content-Type": "application/json"
+            },
+            body: data
+        })
+        .then(response => response)
+        .catch(error => {
+            if (error.response) {
+                console.log({msg: "error response ", err: error})
+              }
+              else if (error.request) {
+                console.log({msg: "error request ", err: error})
+              }
+              else {
+                console.log({msg: "error common ", err: error})
+              }
+        })
+    }
+
+    const makePayment = (event) => {
         event.preventDefault()
 
-        // order_id:Math.floor(Math.random()*10000)
         let data = {
             total_payment: orderItems.totalAmmount,
             total_item: orderItems.totalCart,
             phone: phone,
-            name: fname,
-            email: email,
+            name: user.username,
+            email: user.email,
             uid: user._id,
-            order_id: orderId
+            order_id: "order_" + extra
         }
 
         const axiosConfig = {
@@ -102,65 +131,17 @@ const PlaceOrder = () => {
                 }
             })
 
-        // paytm redirect process 
-        try {
-            const response = await axios.post('http://localhost:8000/payment/paytm', {
-                amount: orderItems.totalAmmount
-            });
+        getData().then(response => {
 
-            const { mid, order_id, amount } = response.data
-            const txnToken = response.data.body.txnToken;
+            navigate('/vieworders')
+            var information = {
+                action: "https://securegw-stage.paytm.in/order/process",
+                params: response
+            }
+            post(information)
 
-            var config = {
-                "root": "",
-                "flow": "DEFAULT",
-                "data": {
-                    "orderId": order_id, /* update order id */
-                    "token": txnToken, /* update token value */
-                    "tokenType": "TXN_TOKEN",
-                    "amount": amount, /* update amount */
-                    "userDetail": {
-                        "mobileNumber": 7073549519,
-                        "name": user?.displayName
-                    }
-                },
-                "merchant": {
-                    "redirect": false
-                },
-                // payMode:{
-                //     "order": ['UPI', 'NB','CARD']
-                //   },
-                /*
-                    hello bhai logo kya tum muje jante ho kya agar nahi to me tumhe mar dunga smaj me aaya kya ya nahi salo me tumhe mar dunga 
-                    manoj bhatt ka nam nahi to me tumhe nahi marunga 
-                */
-                "handler": {
-                    "notifyMerchant": function (eventName, data) {
-                        // console.log("notifyMerchant handler function called");
-                        // console.log("eventName = > ", eventName);
-                        if (eventName === 'SUCCESS') {
-                            console.log('Transaction successful!')
-                        } else if (eventName === 'ERROR') {
-                            console.log('Transaction failed!')
-                        }
-                        console.log("data => ", data);
-                    },
-                    transactionStatus: function (data) {
-                        console.log("payment status ", data);
-
-                    }
-                }
-            };
-
-            loadCheckoutScript(mid, config)
-            // onScriptLoad(config)
-        } catch (error) {
-            console.log(`error while getting the configration of user `);
-        }
-
+        })
     }
-
-
 
     if (!isPlaced) {
         return (
@@ -169,13 +150,13 @@ const PlaceOrder = () => {
 
                     <form action='http://localhost:4100/paynow' method='POST'>
                         <input type="hidden" name='cost' value={orderItems.totalAmmount} id="" className=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500  w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder=" " required />
-                        <input type="hidden" name='id' value={orderId} id="" className=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500  w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder=" " required />
+                        {/* <input type="hidden" name='id' value={orderId} id="" className=" bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500  w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder=" " required /> */}
                         <div className="relative z-0 w-full mb-6 group">
                             <label htmlFor="email" className="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
                             {/* <input value={email} onChange={(e) => setEmail(e.target.value)} type="email" id="email" className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500" placeholder="name@xyz.com" required /> */}
                             <input
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
+                                value={user.email}
+                                // onChange={(e) => setEmail(e.target.value)}
                                 type="email" id="email"
                                 className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
                                 placeholder="name@xyz.com"
@@ -188,7 +169,8 @@ const PlaceOrder = () => {
                         </div>
                         <div className="grid md:grid-cols-2 md:gap-6">
                             <div className="relative z-0 w-full mb-6 group">
-                                <input value={fname} onChange={(e) => setFname(e.target.value)} type="text" name="floating_first_name" id="floating_first_name" className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
+                                {/* <input value={fname} onChange={(e) => setFname(e.target.value)} type="text" name="floating_first_name" id="floating_first_name" className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required /> */}
+                                <input value={user.username} type="text" name="floating_first_name" id="floating_first_name" className="block py-2.5 px-0 w-full text-sm text-gray-900 bg-transparent border-0 border-b-2 border-gray-300 appearance-none dark:text-white dark:border-gray-600 dark:focus:border-blue-500 focus:outline-none focus:ring-0 focus:border-blue-600 peer" placeholder=" " required />
                                 <label htmlFor="floating_first_name" className="peer-focus:font-medium absolute text-sm text-gray-500 dark:text-gray-400 duration-300 transform -translate-y-6 scale-75 top-3 -z-10 origin-[0] peer-focus:left-0 peer-focus:text-blue-600 peer-focus:dark:text-blue-500 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-focus:scale-75 peer-focus:-translate-y-6">First name</label>
                             </div>
                             <div className="relative z-0 w-full mb-6 group">
@@ -206,7 +188,7 @@ const PlaceOrder = () => {
                             </div>
                         </div>
 
-                        <button onClick={checkOut} type="submit" className="text-white bg-[#32aeb1] hover:opacity-80 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Place Order </button>
+                        <button onClick={makePayment} type="submit" className="text-white bg-[#32aeb1] hover:opacity-80 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-xl w-full sm:w-auto px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800">Place Order </button>
                     </form>
 
                 </div>
@@ -221,5 +203,6 @@ const PlaceOrder = () => {
         )
     }
 }
+
 
 export default PlaceOrder

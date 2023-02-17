@@ -27,21 +27,15 @@ function App() {
           <Route path='/signin' element={<Login />} />
           {/* listning page  */}
           <Route path='/list/:cate_id' element={
-            <PrivateRoute>
                 <ListDisplay />
-            </PrivateRoute>
           } />
           {/* details page  */}
           <Route path='/details/:prod_id' element={
-            <PrivateRoute>
                 <DisplayDetails />
-            </PrivateRoute>
           } />
           {/* Cart page  */}
           <Route path='/cart' element={
-            <PrivateRoute>
                 <AddToCart />
-            </PrivateRoute>
           } />
           {/* place order  */}
           <Route path='/placeorder' element={
