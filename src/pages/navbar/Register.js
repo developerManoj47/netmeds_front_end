@@ -12,6 +12,7 @@ const Register = () => {
     const [passwordConfirm, setPasswordConfirm] = useState('');
     const [errors, setErrors] = useState({});
     const [accountCreated, setAccountCreated] = useState(false)
+    const [isExist , setIsExist ] = useState(false);
 
     const navigate = useNavigate()
 
@@ -39,7 +40,12 @@ const Register = () => {
                 }
             })
             .catch((err) => {
-                console.log(err)
+                if(err.response.data.error_code === "EMAIL_ALREADY_EXIST"){
+                    setIsExist(true)
+                    setTimeout(() => {
+                        setIsExist(false)
+                    }, 5000);
+                }
             })
 
     }
@@ -64,6 +70,9 @@ const Register = () => {
             errors.passwordConfirm = 'Please confirm the password';
         } else if (password !== passwordConfirm) {
             errors.passwordConfirm = 'Passwords do not match';
+            setTimeout(() => {
+                errors.passwordConfirm = null
+            }, 3000);
         }
         return errors;
     }
@@ -91,6 +100,12 @@ const Register = () => {
                                     errors.email &&
                                     <div className="mt-3 text-sm font-medium">
                                         <a href="/#" className="  font-semibold underlin text-red-600 hover:text-blue-800 dark:hover:text-blue-900">**{errors.email}</a>
+                                    </div>
+                                }
+                                {
+                                    isExist && 
+                                    <div className="mt-3 text-sm font-medium">
+                                        <a href="/#" className="  font-semibold underlin text-red-600 hover:text-blue-800 dark:hover:text-blue-900">**Email id already exist please try with other email</a>
                                     </div>
                                 }
                             </div>
