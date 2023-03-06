@@ -8,7 +8,8 @@ const Login = () => {
     const [errors, setErrors] = useState({});
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [passwordError , serPasswordError ] = useState(false)
+    const [passwordError , setPasswordError ] = useState(false)
+    const [notRegistered , setNotRegistered ] = useState(false)
 
     const navigate = useNavigate()
 
@@ -26,7 +27,7 @@ const Login = () => {
             "email": email,
             "password": password
         }
-        axios.post('http://localhost:8000/api/auth/login', data)
+        axios.post('https://api-netmeds-in.onrender.com/api/auth/login', data)
             .then((res) => {
                 localStorage.setItem("user" , JSON.stringify(res.data))
                 // console.log(`this data is coming from localstorage `)
@@ -36,9 +37,18 @@ const Login = () => {
             .catch((err) => {
                 // console.log(err.response.data)
                 let errRes = err.response.data;
-                if(errRes.includes("Wrong password or username") || errRes.includes("null")){
-                    serPasswordError(true);
-                }
+                if(errRes.error_code === "USER_NOT_REGISTER"){
+                    setNotRegistered(true)
+                    setTimeout(() => {
+                        setNotRegistered(false)
+                    }, 6000);
+                } else if(errRes.includes("Wrong password or username") || errRes.includes("null")){
+                    setPasswordError(true);
+                    setTimeout(() => {
+                        setPasswordError(false)
+                    }, 3000);
+                } 
+
             })
 
     }
@@ -66,6 +76,12 @@ const Login = () => {
                             errors.email &&
                             <div className="mt-3 text-sm font-medium">
                                 <a href="/#" className="  font-semibold underlin text-red-600 hover:text-blue-800 dark:hover:text-blue-900">**{errors.email}</a>
+                            </div>
+                        }
+                        {
+                            notRegistered && 
+                            <div>
+                                <a href="/#" className="mt-2  font-semibold underlin text-red-600 hover:text-blue-800 dark:hover:text-blue-900">**This User is not Registered / Register first and try agian</a>
                             </div>
                         }
                     </div>

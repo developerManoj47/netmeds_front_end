@@ -15,7 +15,7 @@ const DisplayDetails = () => {
   useEffect(() => {
     const foo = async () => {
       try {
-        const prodDetailsRef = await axios.get(`http://localhost:8000/api/details/${params.prod_id}`)
+        const prodDetailsRef = await axios.get(`https://api-netmeds-in.onrender.com/api/details/${params.prod_id}`)
         let prodDetails = prodDetailsRef.data;
         setProduct(prodDetails);
       }
@@ -30,7 +30,7 @@ const DisplayDetails = () => {
   const addToCart = async (productId) => {
     if (user) {
       try {
-        const res = await axios.get(`http://localhost:8000/api/details/${productId}`);
+        const res = await axios.get(`https://api-netmeds-in.onrender.com/api/details/${productId}`);
         let productDetails = res.data;
 
         let data = {
@@ -51,7 +51,7 @@ const DisplayDetails = () => {
           }
         }
 
-        axios.post(`http://localhost:8000/api/cart/addincart/${user._id}`, data, config)
+        axios.post(`https://api-netmeds-in.onrender.com/api/cart/addincart/${user._id}`, data, config)
           .then((res) => {
             console.log(res);
             cartArr.push(res.data);

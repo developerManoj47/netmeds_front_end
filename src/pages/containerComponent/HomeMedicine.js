@@ -13,7 +13,7 @@ const HomeMedicine = ({ medicineData, beautyData }) => {
     const addToCart = async (productId) => {
         if(user){
             try {
-                const res = await axios.get(`http://localhost:8000/api/details/${productId}`);
+                const res = await axios.get(`https://api-netmeds-in.onrender.com/api/details/${productId}`);
                 let productDetails = res.data;
     
                 let data = {
@@ -34,7 +34,7 @@ const HomeMedicine = ({ medicineData, beautyData }) => {
                     }
                 }
     
-                axios.post(`http://localhost:8000/api/cart/addincart/${user._id}`, data, config)
+                axios.post(`https://api-netmeds-in.onrender.com/api/cart/addincart/${user._id}`, data, config)
                     .then((res) => {
                         console.log(res);
                         cartArr.push(res.data);

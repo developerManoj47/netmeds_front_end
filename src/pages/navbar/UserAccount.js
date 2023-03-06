@@ -30,7 +30,7 @@ const UserAccount = () => {
             "profilePic": file
         }
         // api call
-        axios.put(`http://localhost:8000/api/users/${user._id}`, data, config).then((res) => {
+        axios.put(`https://api-netmeds-in.onrender.com/api/users/${user._id}`, data, config).then((res) => {
             console.log(res);
         }).catch((err) => {
             console.log(` kya error hn bhai`, err);

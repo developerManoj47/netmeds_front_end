@@ -75,7 +75,7 @@ const PlaceOrder = () => {
         }
 
         // const checksum = await axios.post()
-        return axios(`http://localhost:8000/api/payment/paytm`, {
+        return axios(`https://api-netmeds-in.onrender.com/api/payment/paytm`, {
             method: "POST",
             headers: {
                 Accept: "application/json",
@@ -116,7 +116,7 @@ const PlaceOrder = () => {
             }
         }
 
-        axios.post(`http://localhost:8000/api/order/${user._id}`, data, axiosConfig)
+        axios.post(`https://api-netmeds-in.onrender.com/api/order/${user._id}`, data, axiosConfig)
             .then((res) => {
                 console.log(`new order `, res);
                 setIsPlaced(true);

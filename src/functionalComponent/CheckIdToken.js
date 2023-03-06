@@ -4,7 +4,7 @@ import axios from 'axios'
 const checkIdToken = () => {
 
     let user = JSON.parse(localStorage.getItem("user"));
-    const baseUrl = "http://localhost:8000/api"
+    const baseUrl = "https://api-netmeds-in.onrender.com/api"
 
     const api = axios.create({
         baseUrl,

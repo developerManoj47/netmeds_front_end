@@ -32,7 +32,7 @@ const Register = () => {
             "email": email,
             "password": password
         }
-        axios.post('http://localhost:8000/api/auth/register', data)
+        axios.post('https://api-netmeds-in.onrender.com/api/auth/register', data)
             .then((res) => {
                 console.log(res)
                 if(res.data._id){

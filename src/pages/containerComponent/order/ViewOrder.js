@@ -11,7 +11,7 @@ const ViewOrder = () => {
   useEffect(() => {
     const foo = async () => {
       try {
-        let res = await axios.get(`http://localhost:8000/api/order/${user._id}`);
+        let res = await axios.get(`https://api-netmeds-in.onrender.com/api/order/${user._id}`);
         let orderList = res.data;
         setOrderedItems(orderList);
       }

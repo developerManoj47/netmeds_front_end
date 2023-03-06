@@ -32,7 +32,7 @@ const Navbar = () => {
     useEffect(() => {
         const getSearchList = async () => {
             try {
-                const res = await axios.get('http://localhost:8000/api/list');
+                const res = await axios.get('https://api-netmeds-in.onrender.com/api/list');
                 const listData = res.data;
                 setSearchList(listData);
                 // console.log(searchList)
@@ -69,7 +69,7 @@ const Navbar = () => {
     useEffect(() => {
         const foo = async () => {
             try {
-                const res = await axios.get('http://localhost:8000/api/category');
+                const res = await axios.get('https://api-netmeds-in.onrender.com/api/category');
                 const categroyList = res.data;
                 setCategoryArr(categroyList);
                 // console.log(searchList)

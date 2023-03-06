@@ -14,10 +14,10 @@ const ParentCompo = () => {
     useEffect(() => {
       const foo = async () => {
           try {
-              const medicineRes = await axios.get(`http://localhost:8000/api/list/m1?category=medicine`);
+              const medicineRes = await axios.get(`https://api-netmeds-in.onrender.com/api/list/m1?category=medicine`);
               const medicineData = medicineRes.data;
               setRandomMedicine(medicineData);
-              const res = await axios.get(`http://localhost:8000/api/list/b1?category=beauty`);
+              const res = await axios.get(`https://api-netmeds-in.onrender.com/api/list/b1?category=beauty`);
               const beautyData = res.data;
               setRandomBeauty(beautyData);
               // console.log(searchList)

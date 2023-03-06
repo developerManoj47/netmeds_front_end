@@ -20,7 +20,7 @@ const AddToCart = () => {
         const foo = async () => {
             if(user){
                 try {
-                    let res = await axios.get(`http://localhost:8000/api/cart/${user._id}`);
+                    let res = await axios.get(`https://api-netmeds-in.onrender.com/api/cart/${user._id}`);
                     let carts = res.data;
                     setCartItems(carts);
                 }
@@ -34,7 +34,7 @@ const AddToCart = () => {
 
     const removeCart = async (productId) => {
         try {
-            let res = await axios.delete(`http://localhost:8000/api/cart/delete/${productId}`);
+            let res = await axios.delete(`https://api-netmeds-in.onrender.com/api/cart/delete/${productId}`);
             let carts = res.data;
             console.log(carts);
             setDeleteCart(deleteCart + 1);

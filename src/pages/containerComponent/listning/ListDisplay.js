@@ -26,7 +26,7 @@ const ListDisplay = () => {
     useEffect(() => {
         const foo = async () => {
             try {
-                const res = await axios.get('http://localhost:8000/api/category');
+                const res = await axios.get('https://api-netmeds-in.onrender.com/api/category');
                 const categroyList = res.data;
                 setCategoryArr(categroyList);
                 // console.log(searchList)
@@ -44,7 +44,7 @@ const ListDisplay = () => {
 
             if (sortItem) {
                 try {
-                    let highToLow = await axios.get(`http://localhost:8000/api/list/${params.cate_id}?sort=high`);
+                    let highToLow = await axios.get(`https://api-netmeds-in.onrender.com/api/list/${params.cate_id}?sort=high`);
                     let sortItemList = highToLow.data;
                     setListOfItem(sortItemList);
                     // console.log(searchList)
@@ -54,7 +54,7 @@ const ListDisplay = () => {
             }
             else {
                 try {
-                    const dataRef = await axios.get(`http://localhost:8000/api/list/${params.cate_id}?sort=low`);
+                    const dataRef = await axios.get(`https://api-netmeds-in.onrender.com/api/list/${params.cate_id}?sort=low`);
                     const listOfProducts = dataRef.data;
                     setListOfItem(listOfProducts);
                     // console.log(searchList)
@@ -72,22 +72,22 @@ const ListDisplay = () => {
         const foo = async () => {
             let filterUrl = ""
             if (selectedOption === "option1") {
-                filterUrl = `http://localhost:8000/api/list/${params.cate_id}?lcost=10&hcost=1500`
+                filterUrl = `https://api-netmeds-in.onrender.com/api/list/${params.cate_id}?lcost=10&hcost=1500`
             }
             else if (selectedOption === "option2") {
-                filterUrl = `http://localhost:8000/api/list/${params.cate_id}?lcost=100&hcost=500`
+                filterUrl = `https://api-netmeds-in.onrender.com/api/list/${params.cate_id}?lcost=100&hcost=500`
             }
             else if (selectedOption === "option3") {
-                filterUrl = `http://localhost:8000/api/list/${params.cate_id}?lcost=100&hcost=999`
+                filterUrl = `https://api-netmeds-in.onrender.com/api/list/${params.cate_id}?lcost=100&hcost=999`
             }
             else if (selectedOption === "option4") {
-                filterUrl = `http://localhost:8000/api/list/${params.cate_id}?lcost=500&hcost=1000`
+                filterUrl = `https://api-netmeds-in.onrender.com/api/list/${params.cate_id}?lcost=500&hcost=1000`
             }
             else if (selectedOption === "option5") {
-                filterUrl = `http://localhost:8000/api/list/${params.cate_id}?lcost=1000&hcost=1500`
+                filterUrl = `https://api-netmeds-in.onrender.com/api/list/${params.cate_id}?lcost=1000&hcost=1500`
             }
             else {
-                filterUrl = `http://localhost:8000/api/list/${params.cate_id}`
+                filterUrl = `https://api-netmeds-in.onrender.com/api/list/${params.cate_id}`
             }
 
             try {
@@ -106,7 +106,7 @@ const ListDisplay = () => {
       const addToCart = async (productId) => {
         if(user){
             try {
-                const res = await axios.get(`http://localhost:8000/api/details/${productId}`);
+                const res = await axios.get(`https://api-netmeds-in.onrender.com/api/details/${productId}`);
                 let productDetails = res.data;
     
                 let data = {
@@ -127,7 +127,7 @@ const ListDisplay = () => {
                     }
                 }
     
-                axios.post(`http://localhost:8000/api/cart/addincart/${user._id}`, data, config)
+                axios.post(`https://api-netmeds-in.onrender.com/api/cart/addincart/${user._id}`, data, config)
                     .then((res) => {
                         console.log(res);
                         cartArr.push(res.data);
